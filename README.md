@@ -1,2 +1,4 @@
 # ft_irc
-Internet Relay Chat
+This project is about creating my own IRC server.
+
+
