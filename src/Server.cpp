@@ -18,7 +18,7 @@ void Server::server_start(int port, std::string pwd)
 
         for (size_t i = 0; i < fd_poll.size(); i++)
 		{
-			if (fd_poll[i].revents == POLLIN)
+			if (fd_poll[i].revents & POLLIN)
 			{
 				if (fd_poll[i].fd == socketfd)
 					accept_client();
