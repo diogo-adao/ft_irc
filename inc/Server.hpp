@@ -35,6 +35,10 @@ class Server {
         void create_socketfd();
         void accept_client();
         void recvData(int fd);
+        void handle_cmd(std::string &cmd, int fd);
+
+        // Getters
+        Client *get_client(int fd);
 
         // Utils
         static void sig_handler(int sig);

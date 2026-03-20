@@ -3,6 +3,16 @@
 Server::Server() : socketfd(-1) {}
 Server::~Server() {}
 
+Client *Server::get_client(int fd)
+{ 
+    for (size_t i = 0; i < clients.size(); i++)
+    {
+		if (clients[i].get_clientfd() == fd)
+			return &clients[i];
+	}
+	return NULL;
+}
+
 // ============ SERVER CONFIGURATION ============ 
 void Server::server_start(int port, std::string pwd)
 {
@@ -18,7 +28,7 @@ void Server::server_start(int port, std::string pwd)
 
         for (size_t i = 0; i < fd_poll.size(); i++)
 		{
-			if (fd_poll[i].revents & POLLIN)
+			if (fd_poll[i].revents == POLLIN)
 			{
 				if (fd_poll[i].fd == socketfd)
 					accept_client();
@@ -93,13 +103,22 @@ void Server::recvData(int fd)
 		std::cout << "Client " << fd << " disconnected" << std::endl;
 		remove_client(fd);
         close(fd);
+        return;
 	}
-	else
+
+    Client *client = get_client(fd);
+    client->append_buffer(buff);
+
+    std::string &buf = client->get_buffer();
+    size_t pos;
+
+    while ((pos = buf.find("\r\n")) != std::string::npos)
     {
-		buff[bytes] = '\0';
-		std::cout << "Client " << fd << " said: " << buff;
-		// Missing code to process data
-	}
+        std::string cmd = buf.substr(0, pos);
+        buf.erase(0, pos + 2);
+        if (!cmd.empty())
+            handle_cmd(cmd, fd); // Next: Implement this function!
+    }
 }
 
 // ============ UTILS ============ 
